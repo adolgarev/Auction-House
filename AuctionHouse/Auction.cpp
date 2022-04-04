@@ -1,9 +1,11 @@
+#include "easylogging++.h"
 #include "Auction.h"
 
 namespace auction {
 
 	int Auction::deposit(std::string login, std::string itemName, int amount)
 	{
+		LOG(DEBUG) << "Deposit" << login << itemName << amount;
 		auto t = db.startTransaction();
 		int newAmount = db.select(login, itemName) + amount;
 		db.update(login, itemName, newAmount);
@@ -13,6 +15,7 @@ namespace auction {
 
 	int Auction::withdraw(std::string login, std::string itemName, int amount)
 	{
+		LOG(DEBUG) << "Withdraw" << login << itemName << amount;
 		auto t = db.startTransaction();
 		int newAmount = db.select(login, itemName) - amount;
 		int itemsOnHold = onHold.select(login, itemName);
@@ -25,6 +28,7 @@ namespace auction {
 
 	void Auction::sell(std::string login, std::string itemName, int amount, int minPrice)
 	{
+		LOG(DEBUG) << "Sell" << login << itemName << amount << minPrice;
 		auto t = db.startTransaction();
 
 		int itemsOnHold = onHold.select(login, itemName);
@@ -48,6 +52,7 @@ namespace auction {
 
 	void Auction::buy(std::string login, uint32_t orderId, int price)
 	{
+		LOG(DEBUG) << "Buy" << login << orderId << price;
 		auto t = db.startTransaction();
 
 		auto it = idToOrder.find(orderId);
@@ -68,11 +73,13 @@ namespace auction {
 
 	const std::map<uint32_t, Order>& Auction::orderBook()
 	{
+		LOG(DEBUG) << "OrderBook";
 		return idToOrder;
 	}
 
 	std::map<std::string, int> Auction::inventory(std::string login)
 	{
+		LOG(DEBUG) << "Inventory" << login;
 		auto itemNameToAmount{ db.select(login) };
 		for (auto& elt : itemNameToAmount)
 		{
@@ -83,6 +90,8 @@ namespace auction {
 
 	void Auction::on(Order* order)
 	{
+		LOG(DEBUG) << "Order expired" << order->id << order->loginFrom << order->itemName
+			<< order->amount << order->price << order->loginTo;
 		auto t = db.startTransaction();
 
 		int itemsOnHold = onHold.select(order->loginFrom, order->itemName);

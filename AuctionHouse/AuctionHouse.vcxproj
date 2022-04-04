@@ -143,6 +143,7 @@
     <ClCompile Include="AuctionHouse.cpp" />
     <ClCompile Include="Db.cpp" />
     <ClCompile Include="DbTransaction.cpp" />
+    <ClCompile Include="easylogging++.cc" />
     <ClCompile Include="InMemoryDb.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -153,6 +154,7 @@
     <ClInclude Include="Db.h" />
     <ClInclude Include="DbTransaction.h" />
     <ClInclude Include="DummyTimer.h" />
+    <ClInclude Include="easylogging++.h" />
     <ClInclude Include="InMemoryDb.h" />
     <ClInclude Include="Order.h" />
     <ClInclude Include="Timer.h" />

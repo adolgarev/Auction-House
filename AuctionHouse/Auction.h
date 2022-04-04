@@ -23,7 +23,7 @@ namespace auction {
 		int orderExpiresInSeconds;
 	public:
 		Auction(Db& db, int sellingFee, Timer<Order>& timer, int orderExpiresInSeconds) : db(db),
-			lastOrderId(0), sellingFee(sellingFee), timer(timer), orderExpiresInSeconds(orderExpiresInSeconds) {}
+			lastOrderId(0), sellingFee(sellingFee), timer(timer), orderExpiresInSeconds(orderExpiresInSeconds), onHold("onHold") {}
 		int deposit(std::string login, std::string itemName, int amount);
 		int withdraw(std::string login, std::string itemName, int amount);
 		void sell(std::string login, std::string itemName, int amount, int minPrice);
