@@ -100,6 +100,10 @@ BOOST_AUTO_TEST_CASE(SellTest)
 	BOOST_TEST(8 == order->amount);
 	BOOST_TEST(50 == order->price);
 	BOOST_TEST("" == order->loginTo);
+
+	const auto& orderBook = auc.orderBook();
+	BOOST_TEST(1 == orderBook.size());
+	BOOST_TEST(order == &orderBook.find(order->id)->second);
 }
 
 BOOST_AUTO_TEST_CASE(SellInsufficientItemsTest)
@@ -191,6 +195,9 @@ BOOST_AUTO_TEST_CASE(OrderCompletedTest)
 	inv = auc.inventory("testLogin2");
 	BOOST_TEST(13 == inv["testItem"]);
 	BOOST_TEST(40 == inv[auction::fundsItemName]);
+
+	const auto& orderBook = auc.orderBook();
+	BOOST_TEST(0 == orderBook.size());
 }
 
 BOOST_AUTO_TEST_CASE(SimultaneousOrdersCompletedTest)
@@ -207,6 +214,11 @@ BOOST_AUTO_TEST_CASE(SimultaneousOrdersCompletedTest)
 	auc.buy("testLogin2", order1->id, 60);
 	auc.buy("testLogin2", order2->id, 40);
 
+	const auto& orderBookBefore = auc.orderBook();
+	BOOST_TEST(2 == orderBookBefore.size());
+	BOOST_TEST(order1 == &orderBookBefore.find(order1->id)->second);
+	BOOST_TEST(order2 == &orderBookBefore.find(order2->id)->second);
+
 	auc.on(order1);
 	auc.on(order2);
 
@@ -217,6 +229,9 @@ BOOST_AUTO_TEST_CASE(SimultaneousOrdersCompletedTest)
 	inv = auc.inventory("testLogin2");
 	BOOST_TEST(13 == inv["testItem"]);
 	BOOST_TEST(0 == inv[auction::fundsItemName]);
+
+	const auto& orderBookAfter = auc.orderBook();
+	BOOST_TEST(0 == orderBookAfter.size());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
