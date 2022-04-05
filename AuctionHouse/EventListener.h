@@ -6,7 +6,7 @@ namespace auction {
 	class EventListener
 	{
 	public:
-		virtual void on(T*) = 0;
+		virtual void on(const T*) = 0;
 	};
 
 }

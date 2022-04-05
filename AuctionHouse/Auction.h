@@ -29,7 +29,7 @@ namespace auction {
 		void sell(std::string login, std::string itemName, int amount, int minPrice);
 		void buy(std::string login, uint32_t orderId, int price);
 		const std::map<uint32_t, Order>& orderBook();
-		std::map<std::string, int> inventory(std::string login);
-		void on(Order* order);
+		const std::map<std::string, int> inventory(std::string login);
+		void on(const Order* order);
 	};
 }

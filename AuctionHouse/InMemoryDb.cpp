@@ -22,7 +22,7 @@ namespace auction {
 		return amount;
 	}
 
-	std::map<std::string, int> InMemoryDb::select(std::string login)
+	const std::map<std::string, int> InMemoryDb::select(std::string login)
 	{
 		LOG(DEBUG) << "Select" << name << login;
 		auto key = login + '\0';

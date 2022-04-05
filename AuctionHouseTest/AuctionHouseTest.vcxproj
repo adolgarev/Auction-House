@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{109ae52f-3e68-4825-a9ed-a4dccfd090eb}</ProjectGuid>
-    <RootNamespace>AuctionHouse</RootNamespace>
+    <ProjectGuid>{65810a82-3885-4fa2-96f6-8a270f3b6793}</ProjectGuid>
+    <RootNamespace>AuctionHouseTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -92,6 +92,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\AuctionHouse\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Db.obj;DbTransaction.obj;InMemoryDb.obj;Auction.obj;easylogging++.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -139,27 +141,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Auction.cpp" />
-    <ClCompile Include="AuctionHouse.cpp" />
-    <ClCompile Include="Db.cpp" />
-    <ClCompile Include="DbTransaction.cpp" />
-    <ClCompile Include="easylogging++.cc" />
-    <ClCompile Include="InMemoryDb.cpp" />
+    <ClCompile Include="AuctionHouseTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Auction.h" />
-    <ClInclude Include="Db.h" />
-    <ClInclude Include="DbTransaction.h" />
-    <ClInclude Include="DummyTimer.h" />
-    <ClInclude Include="easylogging++.h" />
-    <ClInclude Include="InMemoryDb.h" />
-    <ClInclude Include="InsufficientItemsEception.h" />
-    <ClInclude Include="Order.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="EventListener.h" />
+    <ProjectReference Include="..\AuctionHouse\AuctionHouse.vcxproj">
+      <Project>{109ae52f-3e68-4825-a9ed-a4dccfd090eb}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

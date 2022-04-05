@@ -1,5 +1,8 @@
+#include <stdexcept>
+
 #include "easylogging++.h"
 #include "Auction.h"
+#include "InsufficientItemsEception.h"
 
 namespace auction {
 
@@ -17,10 +20,11 @@ namespace auction {
 	{
 		LOG(DEBUG) << "Withdraw" << login << itemName << amount;
 		auto t = db.startTransaction();
-		int newAmount = db.select(login, itemName) - amount;
 		int itemsOnHold = onHold.select(login, itemName);
-		if (newAmount - itemsOnHold < 0)
-			throw "";
+		int curAvailableItems = db.select(login, itemName) - itemsOnHold;
+		if (curAvailableItems - amount < 0)
+			throw InsufficientItemsEception(itemName, curAvailableItems, amount);
+		int newAmount = curAvailableItems + itemsOnHold - amount;
 		db.update(login, itemName, newAmount);
 		t.commit();
 		return newAmount;
@@ -34,12 +38,12 @@ namespace auction {
 		int itemsOnHold = onHold.select(login, itemName);
 		int curAvailableItems = db.select(login, itemName) - itemsOnHold;
 		if (curAvailableItems - amount < 0)
-			throw "";
+			throw InsufficientItemsEception(itemName, curAvailableItems, amount);
 
 		int fundsOnHold = onHold.select(login, fundsItemName);
 		int curAvailableFunds = db.select(login, fundsItemName) - fundsOnHold;
 		if (curAvailableFunds - sellingFee < 0)
-			throw "";
+			throw InsufficientItemsEception(fundsItemName, curAvailableFunds, sellingFee);
 
 		onHold.update(login, itemName, itemsOnHold + amount);
 		onHold.update(login, fundsItemName, fundsOnHold + sellingFee);
@@ -57,15 +61,17 @@ namespace auction {
 
 		auto it = idToOrder.find(orderId);
 		if (it == idToOrder.end())
-			throw "";
+			throw std::invalid_argument("No such order");
 
 		if (it->second.price >= price)
-			throw "";
+			throw std::invalid_argument("Price is too low");
 
 		int fundsOnHold = onHold.select(login, fundsItemName);
 		int curAvailableFunds = db.select(login, fundsItemName) - fundsOnHold;
 		if (curAvailableFunds - price < 0)
-			throw "";
+			throw InsufficientItemsEception(fundsItemName, curAvailableFunds, price);
+
+		onHold.update(login, fundsItemName, fundsOnHold + price);
 
 		it->second.price = price;
 		it->second.loginTo = login;
@@ -77,7 +83,7 @@ namespace auction {
 		return idToOrder;
 	}
 
-	std::map<std::string, int> Auction::inventory(std::string login)
+	const std::map<std::string, int> Auction::inventory(std::string login)
 	{
 		LOG(DEBUG) << "Inventory" << login;
 		auto itemNameToAmount{ db.select(login) };
@@ -88,7 +94,7 @@ namespace auction {
 		return itemNameToAmount;
 	}
 
-	void Auction::on(Order* order)
+	void Auction::on(const Order* order)
 	{
 		LOG(DEBUG) << "Order expired" << order->id << order->loginFrom << order->itemName
 			<< order->amount << order->price << order->loginTo;
@@ -113,7 +119,7 @@ namespace auction {
 			fundsOnHold = onHold.select(order->loginTo, fundsItemName);
 			onHold.update(order->loginTo, fundsItemName, fundsOnHold - order->price);
 			availableFunds = db.select(order->loginTo, fundsItemName);
-			db.update(order->loginTo, order->itemName, availableFunds - order->price);
+			db.update(order->loginTo, fundsItemName, availableFunds - order->price);
 		}
 		else
 		{
