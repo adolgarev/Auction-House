@@ -123,7 +123,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\AuctionHouse\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Db.obj;DbTransaction.obj;InMemoryDb.obj;Auction.obj;easylogging++.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ChunkTokenizer.obj;Db.obj;DbTransaction.obj;InMemoryDb.obj;Auction.obj;easylogging++.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

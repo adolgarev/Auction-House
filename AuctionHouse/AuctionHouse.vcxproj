@@ -139,8 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AsyncTcpServer.cpp" />
+    <ClCompile Include="AsyncTcpSession.cpp" />
     <ClCompile Include="Auction.cpp" />
     <ClCompile Include="AuctionHouse.cpp" />
+    <ClCompile Include="ChunkTokenizer.cpp" />
     <ClCompile Include="Db.cpp" />
     <ClCompile Include="DbTransaction.cpp" />
     <ClCompile Include="easylogging++.cc" />
@@ -150,7 +153,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AsyncTcpServer.h" />
+    <ClInclude Include="AsyncTcpSession.h" />
     <ClInclude Include="Auction.h" />
+    <ClInclude Include="ChunkTokenizer.h" />
     <ClInclude Include="Db.h" />
     <ClInclude Include="DbTransaction.h" />
     <ClInclude Include="DummyTimer.h" />

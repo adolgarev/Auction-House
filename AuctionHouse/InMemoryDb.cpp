@@ -29,7 +29,8 @@ namespace auction {
 
 		std::map<std::string, int> res{};
 		for (auto it = data.lower_bound(key); it != data.end() && it->first.find(key) == 0; ++it) {
-			res[it->first.substr(key.length())] = it->second;
+			if (it->second > 0)
+				res[it->first.substr(key.length())] = it->second;
 		}
 		return res;
 	}

@@ -1,5 +1,6 @@
 #define BOOST_TEST_MODULE AuctionHouseTest
 #include <boost/test/included/unit_test.hpp>
+#include <string>
 #include "../AuctionHouse/easylogging++.h"
 #include "../AuctionHouse/InMemoryDb.h"
 #include "../AuctionHouse/Auction.h"
@@ -7,6 +8,7 @@
 #include "../AuctionHouse/InMemoryDb.h"
 #include "../AuctionHouse/Order.h"
 #include "../AuctionHouse/InsufficientItemsEception.h"
+#include "../AuctionHouse/ChunkTokenizer.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -232,6 +234,128 @@ BOOST_AUTO_TEST_CASE(SimultaneousOrdersCompletedTest)
 
 	const auto& orderBookAfter = auc.orderBook();
 	BOOST_TEST(0 == orderBookAfter.size());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+struct ChunkTokenizerFixture {
+	ChunkTokenizerFixture() : tokenizer(5, 10) {}
+	~ChunkTokenizerFixture() {}
+
+	auction::ChunkTokenizer tokenizer;
+};
+
+BOOST_FIXTURE_TEST_SUITE(ChunkTokenizerTest, ChunkTokenizerFixture)
+
+BOOST_AUTO_TEST_CASE(ChunkTokenizerSimple)
+{
+	std::string data{ "a bb ccc 10\n" };
+	auto res = tokenizer.parse(data.c_str(), data.length());
+	BOOST_TEST(data.length() == res);
+	BOOST_TEST(tokenizer.isCommandReady());
+	BOOST_TEST(!tokenizer.isInErrorState());
+	auto expectedTokens = std::vector<std::string>{ "a","bb","ccc","10" };
+	BOOST_TEST(expectedTokens == tokenizer.tokens());
+}
+
+BOOST_AUTO_TEST_CASE(ChunkTokenizerTwoCommands)
+{
+	std::string data{ "a bb ccc 10\n1 22 333 aa\n" };
+
+	auto res1 = tokenizer.parse(data.c_str(), data.length());
+	BOOST_TEST(data.find('\n') + 1 == res1);
+	BOOST_TEST(tokenizer.isCommandReady());
+	BOOST_TEST(!tokenizer.isInErrorState());
+	auto expectedTokens = std::vector<std::string>{ "a","bb","ccc","10" };
+	BOOST_TEST(expectedTokens == tokenizer.tokens());
+
+	auto res2 = tokenizer.parse(data.c_str() + res1, data.length() - res1);
+	BOOST_TEST(data.length() - res1 == res2);
+	BOOST_TEST(tokenizer.isCommandReady());
+	BOOST_TEST(!tokenizer.isInErrorState());
+	expectedTokens = std::vector<std::string>{ "1","22","333","aa" };
+	BOOST_TEST(expectedTokens == tokenizer.tokens());
+}
+
+BOOST_AUTO_TEST_CASE(ChunkTokenizerTwoChunks)
+{
+	std::string data{ "a bb ccc 10\n" };
+	for (int i = 1; i < data.length() - 1; i++)
+	{
+		auto res1 = tokenizer.parse(data.c_str(), i);
+		BOOST_TEST(i == res1);
+		BOOST_TEST(!tokenizer.isCommandReady());
+		BOOST_TEST(!tokenizer.isInErrorState());
+
+		auto res2 = tokenizer.parse(data.c_str() + i, data.length() - i);
+		BOOST_TEST(data.length() == res1 + res2);
+		BOOST_TEST(tokenizer.isCommandReady());
+		BOOST_TEST(!tokenizer.isInErrorState());
+		auto expectedTokens = std::vector<std::string>{ "a","bb","ccc","10" };
+		BOOST_TEST(expectedTokens == tokenizer.tokens());
+	}
+}
+
+BOOST_AUTO_TEST_CASE(ChunkTokenizerWhitespaces)
+{
+	std::string data{ " \ta bb ccc 10 \n" };
+	auto res = tokenizer.parse(data.c_str(), data.length());
+	BOOST_TEST(data.length() == res);
+	BOOST_TEST(tokenizer.isCommandReady());
+	BOOST_TEST(!tokenizer.isInErrorState());
+	auto expectedTokens = std::vector<std::string>{ "a","bb","ccc","10" };
+	BOOST_TEST(expectedTokens == tokenizer.tokens());
+}
+
+BOOST_AUTO_TEST_CASE(ChunkTokenizerTooManyTokens)
+{
+	std::string data{ "a bb ccc 10 d e\n" };
+	auto res = tokenizer.parse(data.c_str(), data.length());
+	BOOST_TEST(data.length() == res);
+	BOOST_TEST(!tokenizer.isCommandReady());
+	BOOST_TEST(tokenizer.isInErrorState());
+
+	tokenizer.clearErrorState();
+	data = "a bb ccc 10 d e f f f f\n";
+	res = tokenizer.parse(data.c_str(), data.length());
+	BOOST_TEST(data.length() == res);
+	BOOST_TEST(!tokenizer.isCommandReady());
+	BOOST_TEST(tokenizer.isInErrorState());
+
+	tokenizer.clearErrorState();
+	data = "a bb ccc 10\n";
+	res = tokenizer.parse(data.c_str(), data.length());
+	BOOST_TEST(data.length() == res);
+	BOOST_TEST(tokenizer.isCommandReady());
+	BOOST_TEST(!tokenizer.isInErrorState());
+	auto expectedTokens = std::vector<std::string>{ "a","bb","ccc","10" };
+	BOOST_TEST(expectedTokens == tokenizer.tokens());
+}
+
+BOOST_AUTO_TEST_CASE(ChunkTokenizerTokenTooLong)
+{
+	std::string data{ "a bb ccc eeeeeeeeeeeeeeeeeeee\n" };
+	auto res = tokenizer.parse(data.c_str(), data.length());
+	BOOST_TEST(data.length() == res);
+	BOOST_TEST(!tokenizer.isCommandReady());
+	BOOST_TEST(tokenizer.isInErrorState());
+
+	tokenizer.clearErrorState();
+	data = "a bb ccccccccccccccccccccc 10\n";
+	res = tokenizer.parse(data.c_str(), data.length());
+	BOOST_TEST(data.length() == res);
+	BOOST_TEST(!tokenizer.isCommandReady());
+	BOOST_TEST(tokenizer.isInErrorState());
+
+	tokenizer.clearErrorState();
+	data = "a bb ccc 10\n";
+	res = tokenizer.parse(data.c_str(), data.length());
+	BOOST_TEST(data.length() == res);
+	BOOST_TEST(tokenizer.isCommandReady());
+	BOOST_TEST(!tokenizer.isInErrorState());
+	auto expectedTokens = std::vector<std::string>{ "a","bb","ccc","10" };
+	BOOST_TEST(expectedTokens == tokenizer.tokens());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
