@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="AsyncTcpServer.h" />
     <ClInclude Include="AsyncTcpSession.h" />
+    <ClInclude Include="AsyncTimer.h" />
     <ClInclude Include="Auction.h" />
     <ClInclude Include="ChunkTokenizer.h" />
     <ClInclude Include="Db.h" />

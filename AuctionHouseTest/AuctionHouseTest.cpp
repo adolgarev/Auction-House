@@ -177,6 +177,34 @@ BOOST_AUTO_TEST_CASE(BuyTest)
 	BOOST_TEST(40 == inv[auction::fundsItemName]);
 }
 
+BOOST_AUTO_TEST_CASE(BuyTestBiggerBid)
+{
+	auc.deposit("testLogin1", "testItem", 10);
+	auc.deposit("testLogin1", auction::fundsItemName, 10);
+	auc.sell("testLogin1", "testItem", 8, 50);
+	const auction::Order* order = timer.eventArg;
+
+	auc.deposit("testLogin2", auction::fundsItemName, 100);
+	auc.buy("testLogin2", order->id, 60);
+
+	auc.deposit("testLogin3", "testItem", 5);
+	auc.deposit("testLogin3", auction::fundsItemName, 100);
+	auc.buy("testLogin3", order->id, 61);
+
+	BOOST_TEST(order);
+	BOOST_TEST("testLogin1" == order->loginFrom);
+	BOOST_TEST("testItem" == order->itemName);
+	BOOST_TEST(8 == order->amount);
+	BOOST_TEST(61 == order->price);
+	BOOST_TEST("testLogin3" == order->loginTo);
+
+	auto inv = auc.inventory("testLogin2");
+	BOOST_TEST(100 == inv[auction::fundsItemName]);
+
+	inv = auc.inventory("testLogin3");
+	BOOST_TEST(39 == inv[auction::fundsItemName]);
+}
+
 BOOST_AUTO_TEST_CASE(OrderCompletedTest)
 {
 	auc.deposit("testLogin1", "testItem", 10);

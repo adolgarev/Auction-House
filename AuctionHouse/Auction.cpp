@@ -63,7 +63,13 @@ namespace auction {
 		if (it == idToOrder.end())
 			throw std::invalid_argument("No such order");
 
-		if (it->second.price >= price)
+		if (it->second.loginFrom == login)
+			throw std::invalid_argument("You can't buy from yourself");
+
+		if (it->second.price > price && it->second.loginTo == "")
+			throw std::invalid_argument("Price is too low");
+
+		if (it->second.price == price && it->second.loginTo != "")
 			throw std::invalid_argument("Price is too low");
 
 		int fundsOnHold = onHold.select(login, fundsItemName);
@@ -72,6 +78,12 @@ namespace auction {
 			throw InsufficientItemsEception(fundsItemName, curAvailableFunds, price);
 
 		onHold.update(login, fundsItemName, fundsOnHold + price);
+
+		if (it->second.loginTo != "")
+		{
+			int fundsOnHold = onHold.select(it->second.loginTo, fundsItemName);
+			onHold.update(it->second.loginTo, fundsItemName, fundsOnHold - it->second.price);
+		}
 
 		it->second.price = price;
 		it->second.loginTo = login;

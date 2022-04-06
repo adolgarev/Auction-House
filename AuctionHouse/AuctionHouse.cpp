@@ -2,7 +2,7 @@
 #include <iostream>
 #include <boost/asio.hpp>
 #include "Order.h"
-#include "DummyTimer.h"
+#include "AsyncTimer.h"
 #include "InMemoryDb.h"
 #include "Auction.h"
 #include "AsyncTcpServer.h"
@@ -24,7 +24,9 @@ int main(int argc, char* argv[])
 {
 	initLogger(argc, argv);
 
-	auction::DummyTimer<auction::Order> timer{};
+	boost::asio::io_context io_context;
+
+	auction::AsyncTimer<auction::Order> timer{ io_context };
 	auction::InMemoryDb db{ "inventory" };
 	auction::Auction auc{ db, 5, timer, 5 * 60 };
 
@@ -36,8 +38,6 @@ int main(int argc, char* argv[])
 			port = std::atoi(argv[1]);
 		}
 		LOG(DEBUG) << "Listening at" << port;
-
-		boost::asio::io_context io_context;
 
 		auction::AsyncTcpServer s(io_context, port, auc);
 

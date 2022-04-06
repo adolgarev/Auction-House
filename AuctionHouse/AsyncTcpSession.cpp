@@ -29,7 +29,7 @@ void auction::AsyncTcpSession::doRead()
 						{
 							const std::string& command = tokenizer.tokens().front();
 							const size_t argc = tokenizer.tokens().size() - 1;
-							if (command == "login" && argc == 1)
+							if (command == "login" && argc == 1 && login == "")
 							{
 								login = tokenizer.tokens()[1];
 								out << "Logged in as " << login << "\r\n";
@@ -81,7 +81,7 @@ void auction::AsyncTcpSession::doRead()
 							{
 								int orderId = std::atoi(tokenizer.tokens()[1].c_str());
 								int price = std::atoi(tokenizer.tokens()[2].c_str());
-								if (orderId || price == 0)
+								if (orderId == 0 || price == 0)
 								{
 									throw std::runtime_error("Invalid request");
 								}
