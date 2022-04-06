@@ -12,9 +12,9 @@ namespace auction {
 		std::map<std::string, int> data;
 	public:
 		InMemoryDb(std::string name) : name(name) {}
-		virtual void update(std::string login, std::string itemName, int amount) override;
-		virtual int select(std::string login, std::string itemName) override;
-		virtual const std::map<std::string, int> select(std::string login) override;
+		virtual void update(const std::string& login, const std::string& itemName, const int& amount) override;
+		virtual int select(const std::string& login, const std::string& itemName) override;
+		virtual const std::map<std::string, int> select(const std::string& login) override;
 	};
 
 }

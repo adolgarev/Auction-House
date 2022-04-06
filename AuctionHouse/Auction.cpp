@@ -6,7 +6,7 @@
 
 namespace auction {
 
-	int Auction::deposit(std::string login, std::string itemName, int amount)
+	int Auction::deposit(const std::string& login, const std::string& itemName, const int& amount)
 	{
 		LOG(DEBUG) << "Deposit" << login << itemName << amount;
 		auto t = db.startTransaction();
@@ -16,7 +16,7 @@ namespace auction {
 		return newAmount;
 	}
 
-	int Auction::withdraw(std::string login, std::string itemName, int amount)
+	int Auction::withdraw(const std::string& login, const std::string& itemName, const int& amount)
 	{
 		LOG(DEBUG) << "Withdraw" << login << itemName << amount;
 		auto t = db.startTransaction();
@@ -30,7 +30,7 @@ namespace auction {
 		return newAmount;
 	}
 
-	void Auction::sell(std::string login, std::string itemName, int amount, int minPrice)
+	void Auction::sell(const std::string& login, const std::string& itemName, const int& amount, const int& minPrice)
 	{
 		LOG(DEBUG) << "Sell" << login << itemName << amount << minPrice;
 		auto t = db.startTransaction();
@@ -54,7 +54,7 @@ namespace auction {
 		timer.setTimeout(orderExpiresInSeconds, this, &idToOrder[lastOrderId]);
 	}
 
-	void Auction::buy(std::string login, uint32_t orderId, int price)
+	void Auction::buy(const std::string& login, const uint32_t& orderId, const int& price)
 	{
 		LOG(DEBUG) << "Buy" << login << orderId << price;
 		auto t = db.startTransaction();

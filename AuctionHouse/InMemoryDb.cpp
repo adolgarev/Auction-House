@@ -3,14 +3,14 @@
 
 namespace auction {
 
-	void InMemoryDb::update(std::string login, std::string itemName, int amount)
+	void InMemoryDb::update(const std::string& login, const std::string& itemName, const int& amount)
 	{
 		LOG(DEBUG) << "Update" << name << login << itemName << amount;
 		auto key = login + '\0' + itemName;
 		data[key] = amount;
 	}
 
-	int InMemoryDb::select(std::string login, std::string itemName)
+	int InMemoryDb::select(const std::string& login, const std::string& itemName)
 	{
 		auto key = login + '\0' + itemName;
 
@@ -22,7 +22,7 @@ namespace auction {
 		return amount;
 	}
 
-	const std::map<std::string, int> InMemoryDb::select(std::string login)
+	const std::map<std::string, int> InMemoryDb::select(const std::string& login)
 	{
 		LOG(DEBUG) << "Select" << name << login;
 		auto key = login + '\0';

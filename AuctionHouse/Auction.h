@@ -24,10 +24,10 @@ namespace auction {
 	public:
 		Auction(Db& db, int sellingFee, Timer<Order>& timer, int orderExpiresInSeconds) : db(db),
 			lastOrderId(0), sellingFee(sellingFee), timer(timer), orderExpiresInSeconds(orderExpiresInSeconds), onHold("onHold") {}
-		int deposit(std::string login, std::string itemName, int amount);
-		int withdraw(std::string login, std::string itemName, int amount);
-		void sell(std::string login, std::string itemName, int amount, int minPrice);
-		void buy(std::string login, uint32_t orderId, int price);
+		int deposit(const std::string& login, const std::string& itemName, const int& amount);
+		int withdraw(const std::string& login, const std::string& itemName, const int& amount);
+		void sell(const std::string& login, const std::string& itemName, const int& amount, const int& minPrice);
+		void buy(const std::string& login, const uint32_t& orderId, const int& price);
 		const std::map<uint32_t, Order>& orderBook();
 		const std::map<std::string, int> inventory(std::string login);
 		void on(const Order* order);
