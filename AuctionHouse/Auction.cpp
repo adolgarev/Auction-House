@@ -23,7 +23,7 @@ namespace auction {
 		int itemsOnHold = onHold.select(login, itemName);
 		int curAvailableItems = db.select(login, itemName) - itemsOnHold;
 		if (curAvailableItems - amount < 0)
-			throw InsufficientItemsEception(itemName, curAvailableItems, amount);
+			throw InsufficientItemsException(itemName, curAvailableItems, amount);
 		int newAmount = curAvailableItems + itemsOnHold - amount;
 		db.update(login, itemName, newAmount);
 		t.commit();
@@ -38,12 +38,12 @@ namespace auction {
 		int itemsOnHold = onHold.select(login, itemName);
 		int curAvailableItems = db.select(login, itemName) - itemsOnHold;
 		if (curAvailableItems - amount < 0)
-			throw InsufficientItemsEception(itemName, curAvailableItems, amount);
+			throw InsufficientItemsException(itemName, curAvailableItems, amount);
 
 		int fundsOnHold = onHold.select(login, fundsItemName);
 		int curAvailableFunds = db.select(login, fundsItemName) - fundsOnHold;
 		if (curAvailableFunds - sellingFee < 0)
-			throw InsufficientItemsEception(fundsItemName, curAvailableFunds, sellingFee);
+			throw InsufficientItemsException(fundsItemName, curAvailableFunds, sellingFee);
 
 		onHold.update(login, itemName, itemsOnHold + amount);
 		onHold.update(login, fundsItemName, fundsOnHold + sellingFee);
@@ -75,7 +75,7 @@ namespace auction {
 		int fundsOnHold = onHold.select(login, fundsItemName);
 		int curAvailableFunds = db.select(login, fundsItemName) - fundsOnHold;
 		if (curAvailableFunds - price < 0)
-			throw InsufficientItemsEception(fundsItemName, curAvailableFunds, price);
+			throw InsufficientItemsException(fundsItemName, curAvailableFunds, price);
 
 		onHold.update(login, fundsItemName, fundsOnHold + price);
 

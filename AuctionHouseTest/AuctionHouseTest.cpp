@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(WithdrawTest)
 BOOST_AUTO_TEST_CASE(WithdrawInsufficientItemsTest)
 {
 	auc.deposit("testLogin", "testItem", 10);
-	BOOST_CHECK_THROW(auc.withdraw("testLogin", "testItem", 20), auction::InsufficientItemsEception);
+	BOOST_CHECK_THROW(auc.withdraw("testLogin", "testItem", 20), auction::InsufficientItemsException);
 }
 
 BOOST_AUTO_TEST_CASE(SellTest)
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(SellInsufficientItemsTest)
 {
 	auc.deposit("testLogin", "testItem", 10);
 	auc.deposit("testLogin", auction::fundsItemName, 10);
-	BOOST_CHECK_THROW(auc.sell("testLogin", "testItem", 20, 50), auction::InsufficientItemsEception);
+	BOOST_CHECK_THROW(auc.sell("testLogin", "testItem", 20, 50), auction::InsufficientItemsException);
 
 	auto inv = auc.inventory("testLogin");
 	BOOST_TEST(10 == inv["testItem"]);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(SellInsufficientFundsTest)
 {
 	auc.deposit("testLogin", "testItem", 10);
 	auc.deposit("testLogin", auction::fundsItemName, 1);
-	BOOST_CHECK_THROW(auc.sell("testLogin", "testItem", 8, 50), auction::InsufficientItemsEception);
+	BOOST_CHECK_THROW(auc.sell("testLogin", "testItem", 8, 50), auction::InsufficientItemsException);
 
 	auto inv = auc.inventory("testLogin");
 	BOOST_TEST(10 == inv["testItem"]);
