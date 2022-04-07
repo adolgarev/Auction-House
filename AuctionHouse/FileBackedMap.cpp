@@ -58,7 +58,7 @@ namespace auction
 		auto it = data_.find(key);
 		if (it != data_.end())
 		{
-			
+
 			it->second.value = value;
 			wf.seekp(it->second.pos);
 			int32_t v = boost::asio::detail::socket_ops::host_to_network_long(value);

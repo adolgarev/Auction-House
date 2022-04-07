@@ -182,9 +182,10 @@ void auction::AsyncTcpSession::on(const Order* order)
 
 	out << ": order id " << order->id << ", amount " << order->amount << ", item "
 		<< order->itemName << ", price " << order->price << "\r\n";
-	notifications.push_back(out.str());
+	notifications.push_back(std::move(out.str()));
 	if (notifications.size() == 1)
 	{
+		// If this is the first notification there is no async callback to end them
 		doWriteNotification();
 	}
 }
