@@ -168,7 +168,7 @@ void auction::AsyncTcpSession::on(const Order* order)
 	{
 		if (order->loginTo != "")
 		{
-			out << "Sell order complited";
+			out << "Sell order completed";
 		}
 		else
 		{
@@ -177,7 +177,7 @@ void auction::AsyncTcpSession::on(const Order* order)
 	}
 	else
 	{
-		out << "Buy order complited";
+		out << "Buy order completed";
 	}
 
 	out << ": order id " << order->id << ", amount " << order->amount << ", item "
