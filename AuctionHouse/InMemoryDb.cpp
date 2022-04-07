@@ -7,7 +7,14 @@ namespace auction {
 	{
 		LOG(DEBUG) << "Update" << name << login << itemName << amount;
 		auto key = login + '\0' + itemName;
-		data[key] = amount;
+		if (amount == 0)
+		{
+			data.erase(key);
+		}
+		else
+		{
+			data[key] = amount;
+		}
 	}
 
 	int InMemoryDb::select(const std::string& login, const std::string& itemName)

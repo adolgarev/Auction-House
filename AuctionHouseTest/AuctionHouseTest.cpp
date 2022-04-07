@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE AuctionHouseTest
 #include <boost/test/included/unit_test.hpp>
 #include <string>
+#include <cstdio>
 #include "../AuctionHouse/easylogging++.h"
 #include "../AuctionHouse/InMemoryDb.h"
 #include "../AuctionHouse/Auction.h"
@@ -9,6 +10,9 @@
 #include "../AuctionHouse/Order.h"
 #include "../AuctionHouse/InsufficientItemsEception.h"
 #include "../AuctionHouse/ChunkTokenizer.h"
+#include "../AuctionHouse/FileBackedMap.h"
+#include "../AuctionHouse/FileBackedDb.h"
+
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -45,6 +49,144 @@ BOOST_AUTO_TEST_CASE(SelectMany)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(FileBackedMapTest)
+
+BOOST_AUTO_TEST_CASE(FileBackedMapNoEntryShouldReturnZero)
+{
+	char fname[256];
+	int res = tmpnam_s(fname, sizeof(fname));
+	BOOST_TEST(0 == res);
+	auction::FileBackedMap fbmap(fname);
+	std::string key{ "testLogin\0testItem" , 18 };
+	BOOST_TEST(0 == fbmap.get(key));
+}
+
+BOOST_AUTO_TEST_CASE(FileBackedMapUpdateShouldSetValue)
+{
+	char fname[256];
+	int res = tmpnam_s(fname, sizeof(fname));
+	BOOST_TEST(0 == res);
+	auction::FileBackedMap fbmap(fname);
+	std::string key{ "testLogin\0testItem" , 18 };
+	fbmap.set(key, 10);
+	BOOST_TEST(10 == fbmap.get(key));
+}
+
+BOOST_AUTO_TEST_CASE(FileBackedMapWriteRead)
+{
+	char fname[256];
+	int res = tmpnam_s(fname, sizeof(fname));
+	BOOST_TEST(0 == res);
+	std::string key{ "testLogin\0testItem" , 18 };
+	{
+		auction::FileBackedMap fbmap(fname);
+		fbmap.set(key, 10);
+	}
+	auction::FileBackedMap fbmap(fname);
+	BOOST_TEST(10 == fbmap.get(key));
+}
+
+BOOST_AUTO_TEST_CASE(FileBackedMapUpdate)
+{
+	char fname[256];
+	int res = tmpnam_s(fname, sizeof(fname));
+	BOOST_TEST(0 == res);
+	std::string key{ "testLogin\0testItem" , 18 };
+	{
+		auction::FileBackedMap fbmap(fname);
+		fbmap.set(key, 10);
+	}
+	{
+		auction::FileBackedMap fbmap(fname);
+		fbmap.set(key, 20);
+	}
+	{
+		auction::FileBackedMap fbmap(fname);
+		BOOST_TEST(20 == fbmap.get(key));
+	}
+}
+
+BOOST_AUTO_TEST_CASE(FileBackedMapMultiWriteRead)
+{
+	char fname[256];
+	int res = tmpnam_s(fname, sizeof(fname));
+	BOOST_TEST(0 == res);
+	std::string key1{ "testLogin\0testItem1" , 19 };
+	std::string key2{ "testLogin\0testItem2" , 19 };
+	{
+		auction::FileBackedMap fbmap(fname);
+		fbmap.set(key1, 10);
+	}
+	{
+		auction::FileBackedMap fbmap(fname);
+		fbmap.set(key1, 20);
+		fbmap.set(key2, 30);
+	}
+	{
+		auction::FileBackedMap fbmap(fname);
+		BOOST_TEST(20 == fbmap.get(key1));
+		BOOST_TEST(30 == fbmap.get(key2));
+	}
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+BOOST_AUTO_TEST_SUITE(FileBackedDbTest)
+
+BOOST_AUTO_TEST_CASE(FileBackedDbUpdate)
+{
+	char fname[256];
+	int res = tmpnam_s(fname, sizeof(fname));
+	BOOST_TEST(0 == res);
+	auction::FileBackedDb db(fname);
+	{
+		auction::DbTransaction t = db.startTransaction();
+		db.update("testLogin", "testItem", 10);
+		t.commit();
+	}
+	BOOST_TEST(10 == db.select("testLogin", "testItem"));
+}
+
+BOOST_AUTO_TEST_CASE(FileBackedDbUpdateRollback)
+{
+	char fname[256];
+	int res = tmpnam_s(fname, sizeof(fname));
+	BOOST_TEST(0 == res);
+	auction::FileBackedDb db(fname);
+	{
+		auction::DbTransaction t = db.startTransaction();
+		db.update("testLogin", "testItem", 10);
+	}
+	BOOST_TEST(0 == db.select("testLogin", "testItem"));
+}
+
+BOOST_AUTO_TEST_CASE(FileBackedDbRead)
+{
+	char fname[256];
+	int res = tmpnam_s(fname, sizeof(fname));
+	BOOST_TEST(0 == res);
+	{
+		auction::FileBackedDb db(fname);
+		{
+			auction::DbTransaction t = db.startTransaction();
+			db.update("testLogin", "testItem", 10);
+			t.commit();
+		}
+		{
+			auction::DbTransaction t = db.startTransaction();
+			db.update("testLogin", "testItem", 20);
+		}
+	}
+
+	auction::FileBackedDb db(fname);
+	BOOST_TEST(10 == db.select("testLogin", "testItem"));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 
 struct AuctionFixture {
 	AuctionFixture() : db("test"), auc(db, 5, timer, 5 * 60) {	}

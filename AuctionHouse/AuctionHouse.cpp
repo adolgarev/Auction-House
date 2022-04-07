@@ -3,7 +3,7 @@
 #include <boost/asio.hpp>
 #include "Order.h"
 #include "AsyncTimer.h"
-#include "InMemoryDb.h"
+#include "FileBackedDb.h"
 #include "Auction.h"
 #include "AsyncTcpServer.h"
 #include "easylogging++.h"
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 	boost::asio::io_context io_context;
 
 	auction::AsyncTimer<auction::Order> timer{ io_context };
-	auction::InMemoryDb db{ "inventory" };
+	auction::FileBackedDb db{ "inventory" };
 	auction::Auction auc{ db, 5, timer, 5 * 60 };
 
 	try

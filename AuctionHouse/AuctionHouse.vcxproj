@@ -147,6 +147,8 @@
     <ClCompile Include="Db.cpp" />
     <ClCompile Include="DbTransaction.cpp" />
     <ClCompile Include="easylogging++.cc" />
+    <ClCompile Include="FileBackedDb.cpp" />
+    <ClCompile Include="FileBackedMap.cpp" />
     <ClCompile Include="InMemoryDb.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +164,8 @@
     <ClInclude Include="DbTransaction.h" />
     <ClInclude Include="DummyTimer.h" />
     <ClInclude Include="easylogging++.h" />
+    <ClInclude Include="FileBackedDb.h" />
+    <ClInclude Include="FileBackedMap.h" />
     <ClInclude Include="InMemoryDb.h" />
     <ClInclude Include="InsufficientItemsEception.h" />
     <ClInclude Include="Order.h" />
