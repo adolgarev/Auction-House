@@ -138,8 +138,29 @@ namespace auction {
 			db.update(order->loginFrom, fundsItemName, availableFunds - sellingFee);
 		}
 
+
+		auto it = clientLiteners.find(order->loginFrom);
+		if (it != clientLiteners.end())
+			it->second->on(order);
+		if (order->loginTo != "")
+		{
+			it = clientLiteners.find(order->loginTo);
+			if (it != clientLiteners.end())
+				it->second->on(order);
+		}
+
 		idToOrder.erase(order->id);
 
 		t.commit();
+	}
+
+	void Auction::addClientListener(const std::string& login, EventListener<Order>* listener)
+	{
+		clientLiteners[login] = listener;
+	}
+
+	void Auction::removeClientLitener(const std::string& login)
+	{
+		clientLiteners.erase(login);
 	}
 }

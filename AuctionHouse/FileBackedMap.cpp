@@ -13,6 +13,7 @@ namespace auction
 		// Create file if doesn't exist
 		wf.open(fname, std::ios_base::out | std::ios_base::app);
 		wf.close();
+		wf.clear();
 		wf.open(fname, std::ios_base::out | std::ios_base::in | std::ios_base::binary);
 		if (!wf)
 		{
@@ -32,7 +33,7 @@ namespace auction
 		std::ifstream rf(fname, std::ios_base::in | std::ios_base::binary);
 		if (!rf)
 		{
-			LOG(DEBUG) << "Cannot open file" << fname;
+			// File doesn't exist, nothing to read
 			return;
 		}
 		char key[maxTokenLength * 2 + 2];

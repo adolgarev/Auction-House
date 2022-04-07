@@ -75,6 +75,8 @@ namespace auction
 
     void FileBackedDb::rollbackTransaction()
     {
+        if (wal.data().empty())
+            return;
         std::string walFname = fname + ".wal";
         wal.close();
         auto status = remove(walFname.c_str());
@@ -92,7 +94,7 @@ namespace auction
         auto status = remove(walFname.c_str());
         if (status)
         {
-            LOG(WARNING) << "Cannot remove file" << walFname;
+            LOG(DEBUG) << "No WAL file" << walFname;
         }
 
         std::string walFnameCommitted = fname + ".wal.committed";

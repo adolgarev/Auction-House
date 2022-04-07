@@ -33,6 +33,7 @@ void auction::AsyncTcpSession::doRead()
 							{
 								login = tokenizer.tokens()[1];
 								out << "Logged in as " << login << "\r\n";
+								auc.addClientListener(login, this);
 							}
 							else if (command == "deposit" && argc == 2 && login != "")
 							{
@@ -135,6 +136,8 @@ void auction::AsyncTcpSession::doRead()
 			else
 			{
 				LOG(DEBUG) << "Disconnected";
+				if (login != "")
+					auc.removeClientLitener(login);
 			}
 		});
 }
@@ -148,6 +151,55 @@ void auction::AsyncTcpSession::doWrite()
 			if (!ec)
 			{
 				doRead();
+			}
+			else
+			{
+				LOG(DEBUG) << "Disconnected";
+				if (login != "")
+					auc.removeClientLitener(login);
+			}
+		});
+}
+
+void auction::AsyncTcpSession::on(const Order* order)
+{
+	std::stringstream out;
+	if (login == order->loginFrom)
+	{
+		if (order->loginTo != "")
+		{
+			out << "Sell order complited";
+		}
+		else
+		{
+			out << "Sell order expired";
+		}
+	}
+	else
+	{
+		out << "Buy order complited";
+	}
+
+	out << ": order id " << order->id << ", amount " << order->amount << ", item "
+		<< order->itemName << ", price " << order->price << "\r\n";
+	notifications.push_back(out.str());
+	if (notifications.size() == 1)
+	{
+		doWriteNotification();
+	}
+}
+
+void auction::AsyncTcpSession::doWriteNotification()
+{
+	auto it = notifications.begin();
+	auto self(shared_from_this());
+	boost::asio::async_write(socket_, boost::asio::buffer(it->c_str(), it->length()),
+		[this, self](boost::system::error_code ec, std::size_t /*length*/)
+		{
+			notifications.pop_front();
+			if (!ec && notifications.size() > 0)
+			{
+				doWriteNotification();
 			}
 		});
 }

@@ -21,6 +21,7 @@ namespace auction {
 		int sellingFee;
 		Timer<Order>& timer;
 		int orderExpiresInSeconds;
+		std::map<std::string, EventListener<Order>*> clientLiteners;
 	public:
 		Auction(Db& db, int sellingFee, Timer<Order>& timer, int orderExpiresInSeconds) : db(db),
 			lastOrderId(0), sellingFee(sellingFee), timer(timer), orderExpiresInSeconds(orderExpiresInSeconds), onHold("onHold") {}
@@ -31,5 +32,7 @@ namespace auction {
 		const std::map<uint32_t, Order>& orderBook();
 		const std::map<std::string, int> inventory(std::string login);
 		void on(const Order* order);
+		void addClientListener(const std::string& login, EventListener<Order>* listener);
+		void removeClientLitener(const std::string& login);
 	};
 }
