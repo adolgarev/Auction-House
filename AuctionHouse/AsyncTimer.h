@@ -2,9 +2,7 @@
 #include <SDKDDKVer.h>
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
-#include <deque>
 #include "Timer.h"
-#include "easylogging++.h"
 
 namespace auction
 {
