@@ -101,7 +101,10 @@ namespace auction
 		std::ifstream walFile;
 		walFile.open(walFnameCommitted);
 		if (!walFile)
+		{
+			wal.open(walFname);
 			return;
+		}
 		walFile.close();
 
 		wal.open(walFnameCommitted);

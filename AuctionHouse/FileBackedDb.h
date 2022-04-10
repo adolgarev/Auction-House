@@ -13,7 +13,7 @@ namespace auction
 		FileBackedMap wal;
 		void recover();
 	public:
-		FileBackedDb(std::string fname) : fname(fname), data(fname), wal(fname + ".wal")
+		FileBackedDb(std::string fname) : fname(fname), data(fname), wal()
 		{
 			recover();
 		}

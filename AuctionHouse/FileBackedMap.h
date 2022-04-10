@@ -19,6 +19,7 @@ namespace auction
 		std::map<std::string, FileBackedMapValue> data_;
 		std::ofstream wf;
 	public:
+		FileBackedMap() {}
 		FileBackedMap(const std::string& fname)
 		{
 			try
@@ -27,7 +28,8 @@ namespace auction
 			}
 			catch (const std::exception& e)
 			{
-				(void)e;
+				close();
+				throw e;
 			}
 		}
 		~FileBackedMap()
