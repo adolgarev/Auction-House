@@ -13,27 +13,19 @@ namespace auction
 	class AsyncTimer : public Timer<T>
 	{
 		boost::asio::io_context& io;
-		std::deque<boost::asio::steady_timer> timers;
 	public:
 		AsyncTimer<T>(boost::asio::io_context& io) : io(io) {}
 		virtual void setTimeout(int delaySeconds, EventListener<T>* listener, T* eventArg) override;
-
-		void on(EventListener<T>* listener, T* eventArg);
 	};
 
 	template<typename T>
 	inline void AsyncTimer<T>::setTimeout(int delaySeconds, EventListener<T>* listener, T* eventArg)
 	{
-		boost::asio::steady_timer t(io, boost::asio::chrono::seconds(delaySeconds));
-		t.async_wait(boost::bind(&AsyncTimer::on, this, listener, eventArg));
-		timers.push_back(std::move(t));
-	}
-
-	template<typename T>
-	inline void AsyncTimer<T>::on(EventListener<T>* listener, T* eventArg)
-	{
-		LOG(DEBUG) << "AsyncTimer event occured";
-		timers.pop_front();
-		listener->on(eventArg);
+		auto t = std::make_shared<boost::asio::steady_timer>(io, boost::asio::chrono::seconds(delaySeconds));
+		t->async_wait(
+			[t, listener, eventArg](const boost::system::error_code&) {
+				listener->on(eventArg);
+			}
+		);
 	}
 }
