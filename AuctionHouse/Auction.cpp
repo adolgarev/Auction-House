@@ -8,6 +8,15 @@ namespace auction {
 
 	int Auction::deposit(const std::string& login, const std::string& itemName, const int& amount)
 	{
+		if (login == "")
+			throw std::invalid_argument("Login may not be empty");
+
+		if (itemName == "")
+			throw std::invalid_argument("ItemName may not be empty");
+
+		if (amount <= 0)
+			throw std::invalid_argument("Amount must be a positive integer");
+
 		LOG(DEBUG) << "Deposit" << login << itemName << amount;
 		auto t = db.startTransaction();
 		int newAmount = db.select(login, itemName) + amount;
@@ -18,6 +27,15 @@ namespace auction {
 
 	int Auction::withdraw(const std::string& login, const std::string& itemName, const int& amount)
 	{
+		if (login == "")
+			throw std::invalid_argument("Login may not be empty");
+
+		if (itemName == "")
+			throw std::invalid_argument("ItemName may not be empty");
+
+		if (amount <= 0)
+			throw std::invalid_argument("Amount must be a positive integer");
+
 		LOG(DEBUG) << "Withdraw" << login << itemName << amount;
 		auto t = db.startTransaction();
 		int itemsOnHold = onHold.select(login, itemName);
@@ -32,6 +50,18 @@ namespace auction {
 
 	void Auction::sell(const std::string& login, const std::string& itemName, const int& amount, const int& minPrice)
 	{
+		if (login == "")
+			throw std::invalid_argument("Login may not be empty");
+
+		if (itemName == "")
+			throw std::invalid_argument("ItemName may not be empty");
+
+		if (amount <= 0)
+			throw std::invalid_argument("Amount must be a positive integer");
+
+		if (minPrice <= 0)
+			throw std::invalid_argument("MinPrice must be a positive integer");
+
 		LOG(DEBUG) << "Sell" << login << itemName << amount << minPrice;
 		auto t = db.startTransaction();
 
@@ -56,6 +86,12 @@ namespace auction {
 
 	void Auction::buy(const std::string& login, const uint32_t& orderId, const int& price)
 	{
+		if (login == "")
+			throw std::invalid_argument("Login may not be empty");
+
+		if (price <= 0)
+			throw std::invalid_argument("Price must be a positive integer");
+
 		LOG(DEBUG) << "Buy" << login << orderId << price;
 		auto t = db.startTransaction();
 
@@ -97,6 +133,9 @@ namespace auction {
 
 	const std::map<std::string, int> Auction::inventory(std::string login)
 	{
+		if (login == "")
+			throw std::invalid_argument("Login may not be empty");
+
 		LOG(DEBUG) << "Inventory" << login;
 		auto itemNameToAmount{ db.select(login) };
 		for (auto& elt : itemNameToAmount)
@@ -156,11 +195,17 @@ namespace auction {
 
 	void Auction::addClientListener(const std::string& login, EventListener<Order>* listener)
 	{
+		if (login == "")
+			throw std::invalid_argument("Login may not be empty");
+
 		clientLiteners[login] = listener;
 	}
 
 	void Auction::removeClientLitener(const std::string& login)
 	{
+		if (login == "")
+			throw std::invalid_argument("Login may not be empty");
+
 		clientLiteners.erase(login);
 	}
 }
