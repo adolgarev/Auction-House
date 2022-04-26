@@ -29,91 +29,20 @@ void auction::AsyncTcpSession::doRead()
 						{
 							const std::string& command = tokenizer.tokens().front();
 							const size_t argc = tokenizer.tokens().size() - 1;
+							auto it = nameToCommand.find(command);
 							if (command == "login" && argc == 1 && login == "")
 							{
 								login = tokenizer.tokens()[1];
 								out << "Logged in as " << login << "\r\n";
 								auc.addClientListener(login, this);
 							}
-							else if (command == "deposit" && argc == 2 && login != "")
-							{
-								std::string itemName = tokenizer.tokens()[1];
-								int amount = std::atoi(tokenizer.tokens()[2].c_str());
-								if (amount == 0)
-								{
-									throw std::runtime_error("Invalid request");
-								}
-								else
-								{
-									int newAmount = auc.deposit(login, itemName, amount);
-									out << "Current amount " << itemName << " " << newAmount << "\r\n";
-								}
-							}
-							else if (command == "withdraw" && argc == 2 && login != "")
-							{
-								std::string itemName = tokenizer.tokens()[1];
-								int amount = std::atoi(tokenizer.tokens()[2].c_str());
-								if (amount == 0)
-								{
-									throw std::runtime_error("Invalid request");
-								}
-								else
-								{
-									int newAmount = auc.withdraw(login, itemName, amount);
-									out << "Current amount " << itemName << " " << newAmount << "\r\n";
-								}
-							}
-							else if (command == "sell" && argc == 3 && login != "")
-							{
-								std::string itemName = tokenizer.tokens()[1];
-								int amount = std::atoi(tokenizer.tokens()[2].c_str());
-								int minPrice = std::atoi(tokenizer.tokens()[3].c_str());
-								if (amount == 0 || minPrice == 0)
-								{
-									throw std::runtime_error("Invalid request");
-								}
-								else
-								{
-									auc.sell(login, itemName, amount, minPrice);
-									out << "Sell order created " << itemName << " " << amount << " " << minPrice << "\r\n";
-								}
-							}
-							else if (command == "buy" && argc == 2 && login != "")
-							{
-								int orderId = std::atoi(tokenizer.tokens()[1].c_str());
-								int price = std::atoi(tokenizer.tokens()[2].c_str());
-								if (orderId == 0 || price == 0)
-								{
-									throw std::runtime_error("Invalid request");
-								}
-								else
-								{
-									auc.buy(login, orderId, price);
-									out << "Buy order created " << orderId << " " << price << "\r\n";
-								}
-							}
-							else if (command == "orderBook" && argc == 0 && login != "")
-							{
-								auto orderBook = auc.orderBook();
-								out << "OrderBook: id, itemName, amount, price" << "\r\n";
-								for (const auto& x : orderBook)
-								{
-									out << x.first << " " << x.second.itemName << " " << x.second.amount
-										<< " " << x.second.price << "\r\n";
-								}
-							}
-							else if (command == "inventory" && argc == 0 && login != "")
-							{
-								auto inventory = auc.inventory(login);
-								out << "Inventory " << login << ": itemName, amount" << "\r\n";
-								for (const auto& x : inventory)
-								{
-									out << x.first << " " << x.second << "\r\n";
-								}
-							}
 							else if (command == "help" && argc == 0)
 							{
 								helpMessage();
+							}
+							else if (login != "" && it != nameToCommand.end())
+							{
+								it->second->execute(auc, login, tokenizer.tokens(), out);
 							}
 							else
 							{

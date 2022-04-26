@@ -4,9 +4,12 @@
 #include <string>
 #include <sstream>
 #include <deque>
+#include <map>
+#include <memory>
 #include "Auction.h"
 #include "ChunkTokenizer.h"
 #include "EventListener.h"
+#include "Command.h"
 
 using boost::asio::ip::tcp;
 
@@ -23,6 +26,18 @@ namespace auction
 			: socket_(std::move(socket)), data_(), auc(auc), tokenizer(maxTokens, maxTokenLength),
 			login("")
 		{
+			Command* commands[]{
+				new DepositCommand(),
+				new WithdrawCommand(),
+				new SellCommand(),
+				new BuyCommand(),
+				new OrderBookCommand(),
+				new InventoryCommand()
+			};
+			for (auto command : commands)
+			{
+				nameToCommand[command->name()] = std::move(std::unique_ptr<Command>(command));
+			}
 		}
 
 		void start()
@@ -46,5 +61,6 @@ namespace auction
 		std::string login;
 		std::stringstream out;
 		std::deque<std::string> notifications;
+		std::map<std::string, std::unique_ptr<Command>> nameToCommand;
 	};
 }

@@ -144,6 +144,7 @@
     <ClCompile Include="Auction.cpp" />
     <ClCompile Include="AuctionHouse.cpp" />
     <ClCompile Include="ChunkTokenizer.cpp" />
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="Db.cpp" />
     <ClCompile Include="DbTransaction.cpp" />
     <ClCompile Include="easylogging++.cc" />
@@ -160,6 +161,7 @@
     <ClInclude Include="AsyncTimer.h" />
     <ClInclude Include="Auction.h" />
     <ClInclude Include="ChunkTokenizer.h" />
+    <ClInclude Include="Command.h" />
     <ClInclude Include="Db.h" />
     <ClInclude Include="DbTransaction.h" />
     <ClInclude Include="DummyTimer.h" />
