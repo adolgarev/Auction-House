@@ -2,6 +2,9 @@
 #include <boost/test/included/unit_test.hpp>
 #include <string>
 #include <cstdio>
+#include <stdexcept>
+#include <limits>
+
 #include "../AuctionHouse/easylogging++.h"
 #include "../AuctionHouse/InMemoryDb.h"
 #include "../AuctionHouse/Auction.h"
@@ -204,6 +207,15 @@ BOOST_AUTO_TEST_CASE(DepositTest)
 	int newAmount = auc.deposit("testLogin", "testItem", 10);
 	BOOST_TEST(10 == newAmount);
 
+	auto inv = auc.inventory("testLogin");
+	BOOST_TEST(10 == inv["testItem"]);
+}
+
+BOOST_AUTO_TEST_CASE(DepositAmountTooBigTest)
+{
+	auc.deposit("testLogin", "testItem", 10);
+	BOOST_CHECK_THROW(auc.deposit("testLogin", "testItem", INT_MAX), std::invalid_argument);
+	
 	auto inv = auc.inventory("testLogin");
 	BOOST_TEST(10 == inv["testItem"]);
 }

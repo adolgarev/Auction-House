@@ -20,6 +20,10 @@ namespace auction {
 		LOG(DEBUG) << "Deposit" << login << itemName << amount;
 		auto t = db.startTransaction();
 		int newAmount = db.select(login, itemName) + amount;
+
+		if (newAmount < 0)
+			throw std::invalid_argument("Amount is too big");
+
 		db.update(login, itemName, newAmount);
 		t.commit();
 		return newAmount;
@@ -75,6 +79,11 @@ namespace auction {
 		if (curAvailableFunds - sellingFee < 0)
 			throw InsufficientItemsException(fundsItemName, curAvailableFunds, sellingFee);
 
+		if (itemsOnHold + amount < 0)
+			throw std::invalid_argument("Amount is too big");
+		if (fundsOnHold + sellingFee < 0)
+			throw std::invalid_argument("Too much funds on hold");
+
 		onHold.update(login, itemName, itemsOnHold + amount);
 		onHold.update(login, fundsItemName, fundsOnHold + sellingFee);
 
@@ -113,6 +122,8 @@ namespace auction {
 		if (curAvailableFunds - price < 0)
 			throw InsufficientItemsException(fundsItemName, curAvailableFunds, price);
 
+		if (fundsOnHold + price < 0)
+			throw std::invalid_argument("Too much funds on hold");
 		onHold.update(login, fundsItemName, fundsOnHold + price);
 
 		if (it->second.loginTo != "")
@@ -150,6 +161,10 @@ namespace auction {
 		LOG(DEBUG) << "Order expired" << order->id << order->loginFrom << order->itemName
 			<< order->amount << order->price << order->loginTo;
 		auto t = db.startTransaction();
+
+		// TODO(adolgarev): check integer overflows,
+		// in case order cannot be completed because of this
+		// remove order without selling fee
 
 		int itemsOnHold = onHold.select(order->loginFrom, order->itemName);
 		onHold.update(order->loginFrom, order->itemName, itemsOnHold - order->amount);
