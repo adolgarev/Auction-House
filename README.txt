@@ -1,3 +1,7 @@
+TASK DEFINITION
+
+See "Online Code Test - Auction House".txt
+
 HOW TO RUN
 
 Open solution in VC2019, click Build, then Start. VC2019 comes with NuGet pre-installed and nuget.org source pre-configured out of the box. These are required to download the Boost library.
