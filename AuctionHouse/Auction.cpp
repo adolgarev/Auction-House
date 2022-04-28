@@ -2,7 +2,7 @@
 
 #include "easylogging++.h"
 #include "Auction.h"
-#include "InsufficientItemsEception.h"
+#include "InsufficientItemsException.h"
 
 namespace auction {
 

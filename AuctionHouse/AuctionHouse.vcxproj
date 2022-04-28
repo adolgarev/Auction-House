@@ -169,7 +169,7 @@
     <ClInclude Include="FileBackedDb.h" />
     <ClInclude Include="FileBackedMap.h" />
     <ClInclude Include="InMemoryDb.h" />
-    <ClInclude Include="InsufficientItemsEception.h" />
+    <ClInclude Include="InsufficientItemsException.h" />
     <ClInclude Include="Order.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="EventListener.h" />

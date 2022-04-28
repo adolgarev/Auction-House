@@ -11,7 +11,7 @@
 #include "../AuctionHouse/DummyTimer.h"
 #include "../AuctionHouse/InMemoryDb.h"
 #include "../AuctionHouse/Order.h"
-#include "../AuctionHouse/InsufficientItemsEception.h"
+#include "../AuctionHouse/InsufficientItemsException.h"
 #include "../AuctionHouse/ChunkTokenizer.h"
 #include "../AuctionHouse/FileBackedMap.h"
 #include "../AuctionHouse/FileBackedDb.h"

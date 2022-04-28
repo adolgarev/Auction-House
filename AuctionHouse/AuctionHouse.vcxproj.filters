@@ -83,7 +83,7 @@
     <ClInclude Include="easylogging++.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InsufficientItemsEception.h">
+    <ClInclude Include="InsufficientItemsException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AsyncTcpServer.h">
