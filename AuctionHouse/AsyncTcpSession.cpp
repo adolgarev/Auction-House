@@ -114,7 +114,7 @@ void auction::AsyncTcpSession::on(const Order* order)
 	notifications.push_back(std::move(out.str()));
 	if (notifications.size() == 1)
 	{
-		// If this is the first notification there is no async callback to end them
+		// If this is the first notification there is no async callback to send them
 		doWriteNotification();
 	}
 }
